@@ -4,8 +4,8 @@ const ctx = canvas.getContext('2d');
 const strip = document.querySelector('.strip');
 const snap = document.querySelector('.snap');
 const s3Url = 'https://d183zisuhp1c4e.cloudfront.net/';
-const signedUrlEndpoint = 'https://kl3oydpj38.execute-api.us-east-1.amazonaws.com/sign';
-const s3Bucket = 'cbipoc'
+const signedUrlEndpoint = 'https://mgtoc5ns7i.execute-api.us-east-1.amazonaws.com/sign';
+const s3Bucket = 'markf-uploads'
 
 getVideo();
 
@@ -139,7 +139,7 @@ function blobToFile(theBlob, fileName) {
 }
 
 function getSignedUrlPromise(fileName, fileType) {
-    let url = `${signedUrlEndpoint}/signedurl?name=${fileName}&type=${fileType}`;
+    let url = `${signedUrlEndpoint}/aws-presigned-url?name=${fileName}&type=${fileType}`;
     return fetch(url)
         .then(
             response => response.json() // if the response is a JSON object
@@ -156,7 +156,7 @@ async function upload(imageBlob) {
     let file = blobToFile(imageBlob, 'inputimage.jpg');
     let fileType = 'image/jpeg';
     let uuid = uuidv4();
-    let s3ImagePath = `upload/${uuid}.jpg`;
+    let s3ImagePath = `expression-ai/${uuid}.jpg`;
     const presignedUrlObj = await getSignedUrlPromise(s3ImagePath, fileType);
     const s3ImageUrl = s3Url + s3ImagePath;
     const s3Upload = await fetch(presignedUrlObj.url, {
@@ -232,7 +232,7 @@ function detectFacesAws(s3ImagePath) {
 }
 
 //Provides anonymous log on to AWS services
-function AnonLog() {
+/*function AnonLog() {
     // Configure the credentials provider to use your identity pool
     AWS.config.region = 'us-east-1'; // Region
     AWS.config.credentials = new AWS.CognitoIdentityCredentials({
@@ -245,6 +245,6 @@ function AnonLog() {
         var secretAccessKey = AWS.config.credentials.secretAccessKey;
         var sessionToken = AWS.config.credentials.sessionToken;
     });
-}
+}*/
 
 
