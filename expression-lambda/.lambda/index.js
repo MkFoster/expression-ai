@@ -1,6 +1,6 @@
 'use strict';
 const aws = require('aws-sdk');
-const s3Bucket = 'markf-upload';
+const s3Bucket = 'markf-uploads';
 
 /**
  * Handle API calls.  The "action" 
@@ -8,14 +8,24 @@ const s3Bucket = 'markf-upload';
 exports.handler = (event, context, callback) => {
     try {
         console.log(JSON.stringify(event, null, 4));
+        if ((typeof event.queryStringParameters != `undefined`) && (event.queryStringParameters != null) && 
+          (typeof event.queryStringParameters.action != `undefined`) && (event.queryStringParameters.action != null)) {
+            switch (event.queryStringParameters.action) {
+                case 'analyzeImage':
+                    if ((typeof event.queryStringParameters.uuid != `undefined`) && (event.queryStringParameters.uuid != null)) {
+                        analyzeImage(event.queryStringParameters.uuid, callback);
+                    }
+                    break;
+            }
+        }
     } catch (err) {
         callback(err);
     }
 };
 
-function rekCall(uuid) {
-    AWS.region = "us-east-1";
-    var rekognition = new AWS.Rekognition();
+function analyzeImage(uuid, callback) {
+    aws.region = "us-east-1";
+    var rekognition = new aws.Rekognition();
     var params = {
         Image: {
             "S3Object": {
@@ -27,15 +37,21 @@ function rekCall(uuid) {
             "ALL"
         ]
     };
+    console.log(params);
     rekognition.detectFaces(params, function (err, data) {
         if (err) console.log(err, err.stack); // an error occurred
         else {
             console.log(data);
-            const numFacesDetected = data.FaceDetails.length;
-            const emotionData = data.FaceDetails.map(face => face.Emotions);
-            var htmlOutput = `Number of Faces Detected: ${numFacesDetected} <br>` +
-            `Emotions: ${JSON.stringify(emotionData, null, 4)}`;
-            document.querySelector('#aws-output').innerHTML = htmlOutput;
+            const response = {
+                "isBase64Encoded": false,
+                "statusCode": 200,
+                "headers": {
+                    "content-type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                "body": JSON.stringify(data)
+            };
+            callback(null, response);
         }
     });
 }

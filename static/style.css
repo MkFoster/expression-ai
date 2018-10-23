@@ -59,3 +59,8 @@ html {
     background:white;
     margin: 2rem auto;
   }
+
+  #photo {
+    max-width: 600px;
+    max-height: 600px;
+  }

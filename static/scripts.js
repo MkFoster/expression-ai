@@ -3,9 +3,10 @@ const canvas = document.querySelector('.photo');
 const ctx = canvas.getContext('2d');
 const strip = document.querySelector('.strip');
 const snap = document.querySelector('.snap');
-const s3Url = 'https://d183zisuhp1c4e.cloudfront.net/';
-const signedUrlEndpoint = 'https://mgtoc5ns7i.execute-api.us-east-1.amazonaws.com/sign';
-const s3Bucket = 'markf-uploads'
+const s3Url = `https://d183zisuhp1c4e.cloudfront.net/`;
+const signedUrlEndpoint = `https://mgtoc5ns7i.execute-api.us-east-1.amazonaws.com/sign/aws-presigned-url`;
+const expressionAiEndpoint = `https://l153r1gs0i.execute-api.us-east-1.amazonaws.com/prod/expression-ai`;
+const s3Bucket = `markf-uploads`;
 
 getVideo();
 
@@ -30,56 +31,8 @@ function paintToCanvas() {
     setInterval(() => {
         ctx.drawImage(video, 0, 0, width, height);
         let pixels = ctx.getImageData(0, 0, width, height);
-        //pixels = redEffect(pixels);
-        //pixels = rgbSplit(pixels);
-        //ctx.globalAlpha = 0.1;
-        //pixels = greenScreen(pixels);
         ctx.putImageData(pixels, 0, 0);
-        //debugger;
     }, 16);
-}
-
-function redEffect(pixels) {
-    for (let i = 0; i< pixels.data.length; i+=4) {
-        pixels.data[i + 0] = pixels.data[i + 0] + 100; //R
-        pixels.data[i + 1] = pixels.data[i + 1] - 50;  //G
-        pixels.data[i + 2] = pixels.data[i + 2] * 0.5; //B
-    }
-    return pixels;
-}
-
-function rgbSplit(pixels) {
-    for (let i = 0; i< pixels.data.length; i+=4) {
-        pixels.data[i - 150] = pixels.data[i + 0]; //R
-        pixels.data[i + 100] = pixels.data[i + 1]; //G
-        pixels.data[i - 150] = pixels.data[i + 2]; //B
-    }
-    return pixels;
-}
-
-function greenScreen(pixels) {
-    const levels = {};
-
-    document.querySelectorAll('.rgb input').forEach((input) => {
-        levels[input.name] = input.value;
-    });
-
-    for (let i = 0; i< pixels.data.length; i+=4) {
-        red = pixels.data[i];
-        green = pixels.data[i + 1];
-        blue = pixels.data[i + 2];
-        alpha = pixels.data[i + 3];
-
-        if (red >= levels.rmin
-          && green >= levels.gmin
-          && blue >= levels.bmin
-          && red <= levels.rmax
-          && green <= levels.bmax
-          && blue <= levels.bmax) {
-              pixels.data[i + 3] = 0;
-          }
-    }
-    return pixels;
 }
 
 function takePhoto() {
@@ -139,7 +92,7 @@ function blobToFile(theBlob, fileName) {
 }
 
 function getSignedUrlPromise(fileName, fileType) {
-    let url = `${signedUrlEndpoint}/aws-presigned-url?name=${fileName}&type=${fileType}`;
+    let url = `${signedUrlEndpoint}?name=${fileName}&type=${fileType}`;
     return fetch(url)
         .then(
             response => response.json() // if the response is a JSON object
@@ -167,84 +120,39 @@ async function upload(imageBlob) {
         }
     })
     .then((response) => {
-        detectFacesAws(s3ImagePath);
+        analyzeImage(uuid);
     })
     .catch( error => console.log(error));
-    // Post data for prediction
-    /*
-    fetch(predictionEndpoint, { // Your POST endpoint
-        method: 'POST',
-        headers: {
-            "Prediction-Key": "5e78a8e3a0f44c8ca0c3126df7ba40b4",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({'Url': s3ImageUrl})
-    })
-    .then(response => response.json())
-    .then(
-        success => {
-            jsonBox = document.querySelector('#json');
-            jsonBox.innerHTML = JSON.stringify(success, undefined, 4);
-            predictionData = success.predictions;
-            //Get the new filter list of predictions
-            const filteredPredictionData = getFilteredPredictionData();
-            //Draw the legend
-            drawLegend(filteredPredictionData);
-            //Draw predictions on canvas
-            drawPredictions(filteredPredictionData);
-            //Switch the prediction page
-            showPage('#page-prediction');
-            //Hide the modal
-            hideModal();
-        } // Handle the success response object
-    ).catch(
-        error => console.log(error) // Handle the error response object
-    );*/
 };
 
 //Calls detectFacesAws API and shows estimated ages of detected faces
-function detectFacesAws(s3ImagePath) {
-    AnonLog();
-    AWS.region = "us-east-1";
-    var rekognition = new AWS.Rekognition();
-    var params = {
-        Image: {
-            "S3Object": {
-                "Bucket": s3Bucket,
-                "Name": s3ImagePath
-            }
-        },
-        "Attributes": [
-            "ALL"
-        ]
-    };
-    rekognition.detectFaces(params, function (err, data) {
-        if (err) console.log(err, err.stack); // an error occurred
-        else {
-            console.log(data);
-            const numFacesDetected = data.FaceDetails.length;
-            const emotionData = data.FaceDetails.map(face => face.Emotions);
-            var htmlOutput = `Number of Faces Detected: ${numFacesDetected} <br>` +
-            `Emotions: ${JSON.stringify(emotionData, null, 4)}`;
-            document.querySelector('#aws-output').innerHTML = htmlOutput;
+function analyzeImage(uuid) {
+    const url = `${expressionAiEndpoint}?action=analyzeImage&uuid=${uuid}`;
+    fetch(url)
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        console.log(data);
+        const numFacesDetected = data.FaceDetails.length;
+        const emotionData = data.FaceDetails.map(face => face.Emotions);
+        var htmlOutput = `Number of Faces Detected: ${numFacesDetected} <br>` +
+        `Emotions: ${JSON.stringify(emotionData, null, 4)}`;
+        document.querySelector('#aws-output').innerHTML = htmlOutput;
+        const happy = emotionData[0].find(emotion => {
+            console.log(emotion);
+            console.log((emotion.Type === `HAPPY`));
+            console.log(emotion.Confidence > 50);
+            console.log((emotion.Type === `HAPPY`) && (emotion.Confidence > 50));
+            return (emotion.Type === `HAPPY`) && (emotion.Confidence > 50);
+        });
+        if (typeof happy != 'undefined') {
+            document.querySelector('#photo').src = `assets/photos/happy.jpg`;
+        } else {
+            document.querySelector('#photo').src = `assets/photos/sad.jpg`;
         }
-    });
+        
+
+    })
+    .catch(error => console.log(error)); // an error occurred
 }
-
-//Provides anonymous log on to AWS services
-/*function AnonLog() {
-    // Configure the credentials provider to use your identity pool
-    AWS.config.region = 'us-east-1'; // Region
-    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-        IdentityPoolId: 'us-east-1:26a5d751-6c47-4616-aad7-2367cd6aa5fa',
-    });
-    // Make the call to obtain credentials
-    AWS.config.credentials.get(function () {
-        // Credentials will be available when this function is called.
-        var accessKeyId = AWS.config.credentials.accessKeyId;
-        var secretAccessKey = AWS.config.credentials.secretAccessKey;
-        var sessionToken = AWS.config.credentials.sessionToken;
-    });
-}*/
-
-
