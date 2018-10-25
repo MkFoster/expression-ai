@@ -2,15 +2,40 @@ const video = document.querySelector('.player');
 const canvas = document.querySelector('.photo');
 const ctx = canvas.getContext('2d');
 const strip = document.querySelector('.strip');
-const snap = document.querySelector('.snap');
 const s3Url = `https://d183zisuhp1c4e.cloudfront.net/`;
 const signedUrlEndpoint = `https://mgtoc5ns7i.execute-api.us-east-1.amazonaws.com/sign/aws-presigned-url`;
 const expressionAiEndpoint = `https://l153r1gs0i.execute-api.us-east-1.amazonaws.com/prod/expression-ai`;
 const s3Bucket = `markf-uploads`;
+let vidInterval;
+
+video.addEventListener('canplay', paintToCanvas);
+
+video.addEventListener('play', () => {
+    vidInterval = setInterval(detectFaces,2000); 
+});
+
+video.addEventListener('ended', () => {
+    clearInterval(vidInterval);
+});
 
 getVideo();
 
-video.addEventListener('canplay', paintToCanvas);
+function detectFaces() {
+    // use the face detection library to find the face
+    var comp = ccv.detect_objects({ "canvas" : (ccv.pre(canvas)),
+                                    "cascade" : cascade,
+                                    "interval" : 5,
+                                    "min_neighbors" : 1 });
+    
+    // Draw glasses on everyone!
+    for (var i = 0; i < comp.length; i++) {
+        console.log('face found');
+        console.log(comp[i]);
+    }
+    if (comp.length > 0) {
+        takePhoto();
+    } 
+}
 
 function getVideo() {
     navigator.mediaDevices.getUserMedia({video: true, audio: false})
@@ -36,9 +61,6 @@ function paintToCanvas() {
 }
 
 function takePhoto() {
-    snap.currentTime = 0;
-    snap.play();
-
     const data = canvas.toDataURL('image/jpeg');
     const link = document.createElement('a');
     link.href = data;

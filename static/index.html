@@ -8,10 +8,6 @@
 <body>
 
     <div class="photobooth">
-        <div class="controls">
-            <button onClick="takePhoto()">Take Photo</button>
-        </div>
-
         <canvas class="photo"></canvas>
         <video class="player"></video>
         <div class="strip"></div>
@@ -23,9 +19,9 @@
 
     <img src="" id="photo">
 
-    <audio class="snap" src="http://wesbos.com/demos/photobooth/snap.mp3" hidden></audio>
-
-    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.325.0.min.js"></script>
-    <script src="scripts.js"></script>
+    <script src="js/aws-sdk.min.js"></script>
+    <script src="js/ccv.js"></script>
+    <script src="js/face.js"></script>
+    <script src="js/scripts.js"></script>
 </body>
 </html>
