@@ -85,10 +85,12 @@ function paintToCanvas() {
         ctx.drawImage(video, 0, 0, width, height);
         let pixels = ctx.getImageData(0, 0, width, height);
         ctx.putImageData(pixels, 0, 0);
-        for (var i = 0; i < faceOutlines.length; i++) {
-            //console.log('face found');
-            //console.log(faceOutlines[i]);
-            outlineFaces(faceOutlines[i]);
+        if (typeof faceOutlines != 'undefined') {
+            for (var i = 0; i < faceOutlines.length; i++) {
+                //console.log('face found');
+                //console.log(faceOutlines[i]);
+                outlineFaces(faceOutlines[i]);
+            }
         }
     }, 100);
 }
@@ -188,21 +190,22 @@ function analyzeImage(uuid) {
         var htmlOutput = `Number of Faces Detected: ${numFacesDetected} <br>` +
         `Emotions: ${JSON.stringify(emotionData, null, 4)}`;
         //document.querySelector('#aws-output').innerHTML = htmlOutput;
-        const happy = emotionData[0].find(emotion => {
-            //console.log(emotion);
-            //console.log((emotion.Type === `HAPPY`));
-            //console.log(emotion.Confidence > 50);
-            //console.log((emotion.Type === `HAPPY`) && (emotion.Confidence > 50));
-            return (emotion.Type === `HAPPY`) && (emotion.Confidence > 50);
-        });
-        if (typeof happy != 'undefined') {
-            //document.querySelector('#photo').src = `assets/photos/happy.jpg`;
-            main.style.backgroundImage=`url(assets/photos/happy/happy.jpg)`;
-        } else {
-            //document.querySelector('#photo').src = `assets/photos/sad.jpg`;
-            main.style.backgroundImage=`url(assets/photos/sad/sad.jpg)`;
+        if (typeof emotionData[0] != 'undefined') {
+            const happy = emotionData[0].find(emotion => {
+                //console.log(emotion);
+                //console.log((emotion.Type === `HAPPY`));
+                //console.log(emotion.Confidence > 50);
+                //console.log((emotion.Type === `HAPPY`) && (emotion.Confidence > 50));
+                return (emotion.Type === `HAPPY`) && (emotion.Confidence > 50);
+            });
+            if (typeof happy != 'undefined') {
+                //document.querySelector('#photo').src = `assets/photos/happy.jpg`;
+                main.style.backgroundImage=`url(assets/photos/happy/happy.jpg)`;
+            } else {
+                //document.querySelector('#photo').src = `assets/photos/sad.jpg`;
+                main.style.backgroundImage=`url(assets/photos/sad/sad.jpg)`;
+            }
         }
-        
 
     })
     .catch(error => console.log(error)); // an error occurred
