@@ -85,13 +85,13 @@ function paintToCanvas() {
         ctx.drawImage(video, 0, 0, width, height);
         let pixels = ctx.getImageData(0, 0, width, height);
         ctx.putImageData(pixels, 0, 0);
-        if (typeof faceOutlines != 'undefined') {
+        /*if (typeof faceOutlines != 'undefined') {
             for (var i = 0; i < faceOutlines.length; i++) {
                 //console.log('face found');
                 //console.log(faceOutlines[i]);
                 outlineFaces(faceOutlines[i]);
             }
-        }
+        }*/
     }, 100);
 }
 
