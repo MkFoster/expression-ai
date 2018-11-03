@@ -60,3 +60,5 @@ deploy.env
 
 # next.js build output
 .next
+
+.lambda/
