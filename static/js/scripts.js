@@ -1,11 +1,17 @@
 const video = document.querySelector('.player');
-const canvas = document.querySelector('.photo');
+const canvas = document.querySelector('.monitor');
+const main = document.querySelector('.main');
+const title = document.querySelector('.title');
+const overview = document.querySelector('.overview');
 const ctx = canvas.getContext('2d');
 const strip = document.querySelector('.strip');
 const s3Url = `https://d183zisuhp1c4e.cloudfront.net/`;
 const signedUrlEndpoint = `https://mgtoc5ns7i.execute-api.us-east-1.amazonaws.com/sign/aws-presigned-url`;
 const expressionAiEndpoint = `https://l153r1gs0i.execute-api.us-east-1.amazonaws.com/prod/expression-ai`;
 const s3Bucket = `markf-uploads`;
+const okButton = document.querySelector('#ok');
+const noButton = document.querySelector('#no');
+let faceOutlines;
 let vidInterval;
 
 video.addEventListener('canplay', paintToCanvas);
@@ -18,31 +24,53 @@ video.addEventListener('ended', () => {
     clearInterval(vidInterval);
 });
 
-getVideo();
+okButton.addEventListener('click', getVideo);
+noButton.addEventListener('click', () => window.location = 'https://www.unsplash.com');
 
 function detectFaces() {
     // use the face detection library to find the face
-    var comp = ccv.detect_objects({ "canvas" : (ccv.pre(canvas)),
-                                    "cascade" : cascade,
-                                    "interval" : 5,
-                                    "min_neighbors" : 1 });
-    
-    // Draw glasses on everyone!
-    for (var i = 0; i < comp.length; i++) {
-        console.log('face found');
-        console.log(comp[i]);
-    }
-    if (comp.length > 0) {
+    faceOutlines = ccv.detect_objects({ "canvas" : (ccv.pre(canvas)),
+        "cascade" : cascade,
+        "interval" : 5,
+        "min_neighbors" : 1 });
+    if (faceOutlines.length > 0) {
         takePhoto();
     } 
+}
+
+function outlineFaces(faceBox) {
+    const topLeftX = faceBox.x;
+    const topLeftY = faceBox.y;
+
+    const topRightX = Math.round(topLeftX + (faceBox.width));
+    const topRightY = topLeftY;
+
+    const bottomLeftX = topLeftX;
+    const bottomLeftY = Math.round(topLeftY + (faceBox.height));
+
+    const bottomRightX = topRightX;
+    const bottomRightY = bottomLeftY;
+
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'purple';
+    ctx.beginPath();
+    ctx.moveTo(topLeftX, topLeftY);
+    ctx.lineTo(topRightX, topRightY);
+    ctx.lineTo(bottomRightX, bottomRightY);
+    ctx.lineTo(bottomLeftX, bottomRightY);
+    ctx.lineTo(topLeftX, topRightY);
+    ctx.stroke();
 }
 
 function getVideo() {
     navigator.mediaDevices.getUserMedia({video: true, audio: false})
         .then(localMediaStream => {
-            console.log(localMediaStream);
+            //canvas(localMediaStream);
             video.srcObject = localMediaStream;
             video.play();
+            canvas.style.display = 'block';
+            title.style.display = 'none';
+            overview.style.display = 'none';
         })
         .catch(err => console.error(`OH NO!!`, err));
 }
@@ -57,7 +85,14 @@ function paintToCanvas() {
         ctx.drawImage(video, 0, 0, width, height);
         let pixels = ctx.getImageData(0, 0, width, height);
         ctx.putImageData(pixels, 0, 0);
-    }, 16);
+        if (typeof faceOutlines != 'undefined') {
+            for (var i = 0; i < faceOutlines.length; i++) {
+                //console.log('face found');
+                //console.log(faceOutlines[i]);
+                outlineFaces(faceOutlines[i]);
+            }
+        }
+    }, 100);
 }
 
 function takePhoto() {
@@ -66,11 +101,6 @@ function takePhoto() {
     link.href = data;
     link.setAttribute('download', 'handsome');
     link.innerHTML = `<img src="${data}" alt="Portrait" />`;
-    if (strip.firstChild) {
-        strip.replaceChild(link, strip.firstChild);
-    } else {
-        strip.appendChild(link);
-    }
     upload(dataURLToBlob(data));
 }
 
@@ -125,7 +155,6 @@ function getSignedUrlPromise(fileName, fileType) {
 
 // This will upload the file after having read it
 async function upload(imageBlob) {
-
     //Upload the image
     //showModal('Uploading and analyzing image...');
     let file = blobToFile(imageBlob, 'inputimage.jpg');
@@ -160,20 +189,23 @@ function analyzeImage(uuid) {
         const emotionData = data.FaceDetails.map(face => face.Emotions);
         var htmlOutput = `Number of Faces Detected: ${numFacesDetected} <br>` +
         `Emotions: ${JSON.stringify(emotionData, null, 4)}`;
-        document.querySelector('#aws-output').innerHTML = htmlOutput;
-        const happy = emotionData[0].find(emotion => {
-            console.log(emotion);
-            console.log((emotion.Type === `HAPPY`));
-            console.log(emotion.Confidence > 50);
-            console.log((emotion.Type === `HAPPY`) && (emotion.Confidence > 50));
-            return (emotion.Type === `HAPPY`) && (emotion.Confidence > 50);
-        });
-        if (typeof happy != 'undefined') {
-            document.querySelector('#photo').src = `assets/photos/happy.jpg`;
-        } else {
-            document.querySelector('#photo').src = `assets/photos/sad.jpg`;
+        //document.querySelector('#aws-output').innerHTML = htmlOutput;
+        if (typeof emotionData[0] != 'undefined') {
+            const happy = emotionData[0].find(emotion => {
+                //console.log(emotion);
+                //console.log((emotion.Type === `HAPPY`));
+                //console.log(emotion.Confidence > 50);
+                //console.log((emotion.Type === `HAPPY`) && (emotion.Confidence > 50));
+                return (emotion.Type === `HAPPY`) && (emotion.Confidence > 50);
+            });
+            if (typeof happy != 'undefined') {
+                //document.querySelector('#photo').src = `assets/photos/happy.jpg`;
+                main.style.backgroundImage=`url(assets/photos/happy/happy.jpg)`;
+            } else {
+                //document.querySelector('#photo').src = `assets/photos/sad.jpg`;
+                main.style.backgroundImage=`url(assets/photos/sad/sad.jpg)`;
+            }
         }
-        
 
     })
     .catch(error => console.log(error)); // an error occurred
