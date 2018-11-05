@@ -1,94 +1,98 @@
 {
-  "resource": "/expression-ai",
-  "path": "/expression-ai",
-  "httpMethod": "GET",
-  "headers": {
-      "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-      "accept-encoding": "gzip, deflate, br",
-      "accept-language": "en-US,en;q=0.9",
-      "Host": "l153r1gs0i.execute-api.us-east-1.amazonaws.com",
-      "upgrade-insecure-requests": "1",
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
-      "X-Amzn-Trace-Id": "Root=1-5bce80d9-f887c2ceb2024aee38d05e5c",
-      "X-Forwarded-For": "66.66.117.168",
-      "X-Forwarded-Port": "443",
-      "X-Forwarded-Proto": "https"
-  },
-  "multiValueHeaders": {
-      "accept": [
-          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
-      ],
-      "accept-encoding": [
-          "gzip, deflate, br"
-      ],
-      "accept-language": [
-          "en-US,en;q=0.9"
-      ],
-      "Host": [
-          "l153r1gs0i.execute-api.us-east-1.amazonaws.com"
-      ],
-      "upgrade-insecure-requests": [
-          "1"
-      ],
-      "User-Agent": [
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36"
-      ],
-      "X-Amzn-Trace-Id": [
-          "Root=1-5bce80d9-f887c2ceb2024aee38d05e5c"
-      ],
-      "X-Forwarded-For": [
-          "66.66.117.168"
-      ],
-      "X-Forwarded-Port": [
-          "443"
-      ],
-      "X-Forwarded-Proto": [
-          "https"
-      ]
-  },
-  "queryStringParameters": {
-      "action": "analyzeImage",
-      "uuid": "5k5l-42l34j-34234k-23k4l3j423l4"
-  },
-  "multiValueQueryStringParameters": {
-      "action": [
-          "analyzeImage"
-      ],
-      "uuid": [
-          "5k5l-42l34j-34234k-23k4l3j423l4"
-      ]
-  },
-  "pathParameters": null,
-  "stageVariables": null,
-  "requestContext": {
-      "resourceId": "sj5hqp",
-      "resourcePath": "/expression-ai",
-      "httpMethod": "GET",
-      "extendedRequestId": "PMkR9FDXIAMFWHQ=",
-      "requestTime": "23/Oct/2018:02:00:57 +0000",
-      "path": "/prod/expression-ai",
-      "accountId": "745851906253",
-      "protocol": "HTTP/1.1",
-      "stage": "prod",
-      "domainPrefix": "l153r1gs0i",
-      "requestTimeEpoch": 1540260057326,
-      "requestId": "7b4a918c-d667-11e8-9b38-ef654d6c73fa",
-      "identity": {
-          "cognitoIdentityPoolId": null,
-          "accountId": null,
-          "cognitoIdentityId": null,
-          "caller": null,
-          "sourceIp": "66.66.117.168",
-          "accessKey": null,
-          "cognitoAuthenticationType": null,
-          "cognitoAuthenticationProvider": null,
-          "userArn": null,
-          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
-          "user": null
-      },
-      "domainName": "l153r1gs0i.execute-api.us-east-1.amazonaws.com",
-      "apiId": "l153r1gs0i"
-  },
-  "body": null,
-  "isBase64Encoded": false
+    "resource": "/expression-ai",
+    "path": "/expression-ai",
+    "httpMethod": "GET",
+    "headers": {
+        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+        "accept-encoding": "gzip, deflate, br",
+        "accept-language": "en-US,en;q=0.9",
+        "cache-control": "max-age=0",
+        "Host": "l153r1gs0i.execute-api.us-east-1.amazonaws.com",
+        "upgrade-insecure-requests": "1",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
+        "X-Amzn-Trace-Id": "Root=1-5be051a9-8ec9050aa6ef94b4c42d0aa8",
+        "X-Forwarded-For": "66.66.117.168",
+        "X-Forwarded-Port": "443",
+        "X-Forwarded-Proto": "https"
+    },
+    "multiValueHeaders": {
+        "accept": [
+            "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
+        ],
+        "accept-encoding": [
+            "gzip, deflate, br"
+        ],
+        "accept-language": [
+            "en-US,en;q=0.9"
+        ],
+        "cache-control": [
+            "max-age=0"
+        ],
+        "Host": [
+            "l153r1gs0i.execute-api.us-east-1.amazonaws.com"
+        ],
+        "upgrade-insecure-requests": [
+            "1"
+        ],
+        "User-Agent": [
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"
+        ],
+        "X-Amzn-Trace-Id": [
+            "Root=1-5be051a9-8ec9050aa6ef94b4c42d0aa8"
+        ],
+        "X-Forwarded-For": [
+            "66.66.117.168"
+        ],
+        "X-Forwarded-Port": [
+            "443"
+        ],
+        "X-Forwarded-Proto": [
+            "https"
+        ]
+    },
+    "queryStringParameters": {
+        "action": "analyzeImage",
+        "uuid": "1ccb3c80-74f5-4422-b10b-13f18e03345e"
+    },
+    "multiValueQueryStringParameters": {
+        "action": [
+            "analyzeImage"
+        ],
+        "uuid": [
+            "1ccb3c80-74f5-4422-b10b-13f18e03345e"
+        ]
+    },
+    "pathParameters": null,
+    "stageVariables": null,
+    "requestContext": {
+        "resourceId": "sj5hqp",
+        "resourcePath": "/expression-ai",
+        "httpMethod": "GET",
+        "extendedRequestId": "P5GyeEdhIAMFhUA=",
+        "requestTime": "05/Nov/2018:14:20:25 +0000",
+        "path": "/prod/expression-ai",
+        "accountId": "745851906253",
+        "protocol": "HTTP/1.1",
+        "stage": "prod",
+        "domainPrefix": "l153r1gs0i",
+        "requestTimeEpoch": 1541427625431,
+        "requestId": "f01cdee1-e105-11e8-891d-e5fc10d60fa0",
+        "identity": {
+            "cognitoIdentityPoolId": null,
+            "accountId": null,
+            "cognitoIdentityId": null,
+            "caller": null,
+            "sourceIp": "66.66.117.168",
+            "accessKey": null,
+            "cognitoAuthenticationType": null,
+            "cognitoAuthenticationProvider": null,
+            "userArn": null,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
+            "user": null
+        },
+        "domainName": "l153r1gs0i.execute-api.us-east-1.amazonaws.com",
+        "apiId": "l153r1gs0i"
+    },
+    "body": null,
+    "isBase64Encoded": false
 }

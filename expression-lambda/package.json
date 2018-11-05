@@ -9,6 +9,8 @@
   "author": "Mark Foster",
   "license": "MIT",
   "dependencies": {
+    "aws-sdk": "2.348.0",
+    "lodash": "4.17.11",
     "pg": "7.6.0"
   }
 }
