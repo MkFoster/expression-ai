@@ -184,16 +184,21 @@ function analyzeImage(uuid) {
         return response.json();
     })
     .then(function(data) {
-        console.log(data);
-        if (data.dominantEmotion && data.imageList.length > 0) {
-            main.style.backgroundImage=`url(assets/photos/${data.dominantEmotion.type}/${data.imageList[0]})`;
+        if (data.dominantEmotion && (data.imageList.length > 0)) {
+            main.style.backgroundImage=`url(assets/photos/${data.dominantEmotion.type}/${data.imageList[0].filename})`;
+            setPhotoCreditHtml(data.imageList[0].photographer_id, data.imageList[0].photographer_name);
         }
     })
     .catch(error => console.log(error)); // an error occurred
 }
 
+<<<<<<< HEAD
 function getPhotoCreditHtml(photographerId, photographerName) {
     const photoCredit = `<a style="background-color:black;color:white;text-decoration:none;padding:4px 6px;font-family:-apple-system, BlinkMacSystemFont, &quot;San Francisco&quot;, &quot;Helvetica Neue&quot;, Helvetica, Ubuntu, Roboto, Noto, &quot;Segoe UI&quot;, Arial, sans-serif;font-size:12px;font-weight:bold;line-height:1.2;display:inline-block;border-radius:3px" 
+=======
+function setPhotoCreditHtml(photographerId, photographerName) {
+    const photoCredit = `<a  style="background-color:black;color:white;text-decoration:none;padding:4px 6px;font-family:-apple-system, BlinkMacSystemFont, &quot;San Francisco&quot;, &quot;Helvetica Neue&quot;, Helvetica, Ubuntu, Roboto, Noto, &quot;Segoe UI&quot;, Arial, sans-serif;font-size:12px;font-weight:bold;line-height:1.2;display:inline-block;border-radius:3px" 
+>>>>>>> ff2cc41f525da403fde7739898bff8e1f340adb3
         href="https://unsplash.com/@${photographerId}?utm_medium=referral&amp;utm_campaign=photographer-credit&amp;utm_content=creditBadge" 
         target="_blank" 
         rel="noopener noreferrer" 
@@ -210,4 +215,5 @@ function getPhotoCreditHtml(photographerId, photographerName) {
             ${photographerName}
         </span>
     </a>`;
+    document.querySelector('.photo-credit').innerHTML = photoCredit;
 }

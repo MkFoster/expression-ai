@@ -32,6 +32,7 @@ exports.handler = async (event, context, callback) => {
                 },
                 "body": JSON.stringify(data)
             };
+            console.log(response);
             callback(null, response);
         }
     } catch (err) {
