@@ -193,7 +193,7 @@ function analyzeImage(uuid) {
 }
 
 function getPhotoCreditHtml(photographerId, photographerName) {
-    const photoCredit = `<a  style="background-color:black;color:white;text-decoration:none;padding:4px 6px;font-family:-apple-system, BlinkMacSystemFont, &quot;San Francisco&quot;, &quot;Helvetica Neue&quot;, Helvetica, Ubuntu, Roboto, Noto, &quot;Segoe UI&quot;, Arial, sans-serif;font-size:12px;font-weight:bold;line-height:1.2;display:inline-block;border-radius:3px" 
+    const photoCredit = `<a style="background-color:black;color:white;text-decoration:none;padding:4px 6px;font-family:-apple-system, BlinkMacSystemFont, &quot;San Francisco&quot;, &quot;Helvetica Neue&quot;, Helvetica, Ubuntu, Roboto, Noto, &quot;Segoe UI&quot;, Arial, sans-serif;font-size:12px;font-weight:bold;line-height:1.2;display:inline-block;border-radius:3px" 
         href="https://unsplash.com/@${photographerId}?utm_medium=referral&amp;utm_campaign=photographer-credit&amp;utm_content=creditBadge" 
         target="_blank" 
         rel="noopener noreferrer" 
