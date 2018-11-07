@@ -35,7 +35,7 @@ const polly = new AWS.Polly();
 video.addEventListener('canplay', paintToCanvas);
 
 video.addEventListener('play', () => {
-    vidInterval = setInterval(detectFaces,3000); 
+    vidInterval = setInterval(detectFaces,4000); 
 });
 
 video.addEventListener('ended', () => {
