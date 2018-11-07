@@ -11,8 +11,24 @@ const expressionAiEndpoint = `https://l153r1gs0i.execute-api.us-east-1.amazonaws
 const s3Bucket = `markf-uploads`;
 const okButton = document.querySelector('#ok');
 const noButton = document.querySelector('#no');
+let currentEmotion;
 let faceOutlines;
 let vidInterval;
+
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioContext();
+let sound; //generated audio buffer
+//
+// AWS.config.region = 'us-east-1'; // Region
+// AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+//     IdentityPoolId: 'REPLACE_ME',
+// });
+AWS.config.region = 'us-east-1'; // Region
+AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+    IdentityPoolId: 'us-east-1:6df8fcad-40d3-41da-ba57-ca09df2c86be',
+});
+
+const polly = new AWS.Polly();
 
 video.addEventListener('canplay', paintToCanvas);
 
@@ -85,13 +101,13 @@ function paintToCanvas() {
         ctx.drawImage(video, 0, 0, width, height);
         let pixels = ctx.getImageData(0, 0, width, height);
         ctx.putImageData(pixels, 0, 0);
-        /*if (typeof faceOutlines != 'undefined') {
+        if (typeof faceOutlines != 'undefined') {
             for (var i = 0; i < faceOutlines.length; i++) {
                 //console.log('face found');
                 //console.log(faceOutlines[i]);
                 outlineFaces(faceOutlines[i]);
             }
-        }*/
+        }
     }, 100);
 }
 
@@ -187,6 +203,10 @@ function analyzeImage(uuid) {
         if (data.dominantEmotion && (data.imageList.length > 0)) {
             main.style.backgroundImage=`url(assets/photos/${data.dominantEmotion.type}/${data.imageList[0].filename})`;
             setPhotoCreditHtml(data.imageList[0].photographer_id, data.imageList[0].photographer_name);
+            if (data.dominantEmotion.type != currentEmotion) {
+                textToSpeech(data.dominantEmotion.type);
+                currentEmotion = data.dominantEmotion.type;
+            }
         }
     })
     .catch(error => console.log(error)); // an error occurred
@@ -212,3 +232,38 @@ function setPhotoCreditHtml(photographerId, photographerName) {
     </a>`;
     document.querySelector('.photo-credit').innerHTML = photoCredit;
 }
+
+function textToSpeech(text) {
+    var params = {
+        OutputFormat: "mp3",
+        SampleRate: "16000",
+        Text: text,
+        TextType: "text",
+        VoiceId: "Nicole"
+    };
+
+    polly.synthesizeSpeech(params, function(err, data) {
+        if (err) console.log(err, err.stack); // an error occurred
+        else {
+            console.log(data);           // successful response
+            audioCtx.decodeAudioData(data.AudioStream.buffer, function(buffer) {
+                sound = buffer;
+
+                if (navigator.userAgent.match(/(iPod|iPhone|iPad)/i)) {
+                    $("#speakbutton").show();
+                }
+
+                speak();
+            });
+        }
+    });
+}
+
+function speak() {
+    var source = audioCtx.createBufferSource();
+    source.buffer = sound;
+    source.connect(audioCtx.destination);
+    source.start(0);
+}
+
+textToSpeech('Welcome to Expression A I');
