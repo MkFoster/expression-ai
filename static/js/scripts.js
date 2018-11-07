@@ -11,6 +11,8 @@ const expressionAiEndpoint = `https://l153r1gs0i.execute-api.us-east-1.amazonaws
 const s3Bucket = `markf-uploads`;
 const okButton = document.querySelector('#ok');
 const noButton = document.querySelector('#no');
+let faceBoxOpacity = 1;
+let faceData;
 let currentEmotion;
 let faceOutlines;
 let vidInterval;
@@ -54,27 +56,30 @@ function detectFaces() {
     } 
 }
 
-function outlineFaces(faceBox) {
-    const topLeftX = faceBox.x;
-    const topLeftY = faceBox.y;
+function drawFaceData(faceDetail) {
 
-    const topRightX = Math.round(topLeftX + (faceBox.width));
-    const topRightY = topLeftY;
+    if (faceBoxOpacity < 0) {return};
+    let boundingPoints = {};
+    boundingPoints.topLeftX = Math.round(canvas.width * faceDetail.BoundingBox.Left);
+    boundingPoints.topLeftY = Math.round(canvas.height * faceDetail.BoundingBox.Top);
 
-    const bottomLeftX = topLeftX;
-    const bottomLeftY = Math.round(topLeftY + (faceBox.height));
+    boundingPoints.topRightX = Math.round(boundingPoints.topLeftX + (canvas.width * faceDetail.BoundingBox.Width));
+    boundingPoints.topRightY = boundingPoints.topLeftY;
 
-    const bottomRightX = topRightX;
-    const bottomRightY = bottomLeftY;
+    boundingPoints.bottomLeftX = boundingPoints.topLeftX;
+    boundingPoints.bottomLeftY = Math.round(boundingPoints.topLeftY + (canvas.height * faceDetail.BoundingBox.Height));
 
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = 'purple';
+    boundingPoints.bottomRightX = boundingPoints.topRightX;
+    boundingPoints.bottomRightY = boundingPoints.bottomLeftY;
+
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = `rgba(256,0,256,${faceBoxOpacity})`;
     ctx.beginPath();
-    ctx.moveTo(topLeftX, topLeftY);
-    ctx.lineTo(topRightX, topRightY);
-    ctx.lineTo(bottomRightX, bottomRightY);
-    ctx.lineTo(bottomLeftX, bottomRightY);
-    ctx.lineTo(topLeftX, topRightY);
+    ctx.moveTo(boundingPoints.topLeftX, boundingPoints.topLeftY);
+    ctx.lineTo(boundingPoints.topRightX, boundingPoints.topRightY);
+    ctx.lineTo(boundingPoints.bottomRightX, boundingPoints.bottomRightY);
+    ctx.lineTo(boundingPoints.bottomLeftX, boundingPoints.bottomRightY);
+    ctx.lineTo(boundingPoints.topLeftX, boundingPoints.topRightY);
     ctx.stroke();
 }
 
@@ -101,11 +106,15 @@ function paintToCanvas() {
         ctx.drawImage(video, 0, 0, width, height);
         let pixels = ctx.getImageData(0, 0, width, height);
         ctx.putImageData(pixels, 0, 0);
-        if (typeof faceOutlines != 'undefined') {
-            for (var i = 0; i < faceOutlines.length; i++) {
+        if ((typeof faceData != 'undefined') && 
+          (typeof faceData.FaceDetails != 'undefined') && 
+          Array.isArray(faceData.FaceDetails) &&
+          (faceData.FaceDetails.length > 0)) {
+            faceBoxOpacity = faceBoxOpacity - .05;
+            for (var i = 0; i < faceData.FaceDetails.length; i++) {
                 //console.log('face found');
                 //console.log(faceOutlines[i]);
-                outlineFaces(faceOutlines[i]);
+                drawFaceData(faceData.FaceDetails[i]);
             }
         }
     }, 100);
@@ -200,13 +209,17 @@ function analyzeImage(uuid) {
         return response.json();
     })
     .then(function(data) {
+        console.log(data);
         if (data.dominantEmotion && (data.imageList.length > 0)) {
-            main.style.backgroundImage=`url(assets/photos/${data.dominantEmotion.type}/${data.imageList[0].filename})`;
-            setPhotoCreditHtml(data.imageList[0].photographer_id, data.imageList[0].photographer_name);
+            const image = data.imageList[Math.floor(Math.random()*data.imageList.length)];
+            main.style.backgroundImage=`url(assets/photos/${data.dominantEmotion.type}/${image.filename})`;
+            setPhotoCreditHtml(image.photographer_id, image.photographer_name);
             if (data.dominantEmotion.type != currentEmotion) {
                 textToSpeech(data.dominantEmotion.type);
                 currentEmotion = data.dominantEmotion.type;
             }
+            faceData = data;
+            faceBoxOpacity = 1.0;
         }
     })
     .catch(error => console.log(error)); // an error occurred
